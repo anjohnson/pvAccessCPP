@@ -349,9 +349,9 @@ void ServerSearchHandler::handleResponse(osiSockAddr* responseFrom,
             transport->ensureData(4);
             const int32 cid = payloadBuffer->getInt();
             const string name = SerializeHelper::deserializeString(payloadBuffer, transport.get());
-            // no name check here...
 
-            if (allowed)
+            // Ignore over-length names
+            if (allowed && name.size() <= MAX_CHANNEL_NAME_LENGTH)
             {
                 const std::vector<ChannelProvider::shared_pointer>& _providers = _context->getChannelProviders();
 
