@@ -242,6 +242,13 @@ void AbstractCodec::processReadNormal()  {
                         "not-a-first segmented message received in normal mode");
                 }
 
+                // reject negative payload size (sign-extends to a huge size_t)
+                if (_payloadSize < 0)
+                {
+                    invalidDataStreamHandler();
+                    throw invalid_data_stream_exception("negative payload size");
+                }
+
                 _storedPayloadSize = _payloadSize;
                 _storedPosition = _socketBuffer.getPosition();
                 _storedLimit = _socketBuffer.getLimit();
@@ -363,6 +370,13 @@ void AbstractCodec::processReadSegmented() {
                 invalidDataStreamHandler();
                 throw invalid_data_stream_exception(
                     "not-a-first segmented message expected");
+            }
+
+            // reject negative payload size (sign-extends to a huge size_t)
+            if (_payloadSize < 0)
+            {
+                invalidDataStreamHandler();
+                throw invalid_data_stream_exception("negative payload size");
             }
 
             _storedPayloadSize = _payloadSize;
