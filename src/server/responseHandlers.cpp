@@ -1423,19 +1423,19 @@ void ServerChannelPutRequesterImpl::destroy()
 
 ChannelPut::shared_pointer ServerChannelPutRequesterImpl::getChannelPut()
 {
-    //Lock guard(_mutex);
+    Lock guard(_mutex);
     return _channelPut;
 }
 
 BitSet::shared_pointer ServerChannelPutRequesterImpl::getPutBitSet()
 {
-    //Lock guard(_mutex);
+    Lock guard(_mutex);
     return _bitSet;
 }
 
 PVStructure::shared_pointer ServerChannelPutRequesterImpl::getPutPVStructure()
 {
-    //Lock guard(_mutex);
+    Lock guard(_mutex);
     return _pvStructure;
 }
 
@@ -1692,19 +1692,19 @@ void ServerChannelPutGetRequesterImpl::destroy()
 
 ChannelPutGet::shared_pointer ServerChannelPutGetRequesterImpl::getChannelPutGet()
 {
-    //Lock guard(_mutex);
+    Lock guard(_mutex);
     return _channelPutGet;
 }
 
 PVStructure::shared_pointer ServerChannelPutGetRequesterImpl::getPutGetPVStructure()
 {
-    //Lock guard(_mutex);
+    Lock guard(_mutex);
     return _pvPutStructure;
 }
 
 BitSet::shared_pointer ServerChannelPutGetRequesterImpl::getPutGetBitSet()
 {
-    //Lock guard(_mutex);
+    Lock guard(_mutex);
     return _pvPutBitSet;
 }
 
@@ -1746,14 +1746,14 @@ void ServerChannelPutGetRequesterImpl::send(ByteBuffer* buffer, TransportSendCon
         else if ((QOS_GET_PUT & request) != 0)
         {
             ScopedLock lock(channelPutGet);
-            //Lock guard(_mutex);
+            Lock guard(_mutex);
             _pvPutBitSet->serialize(buffer, control);
             _pvPutStructure->serialize(buffer, control, _pvPutBitSet.get());
         }
         else
         {
             ScopedLock lock(channelPutGet);
-            //Lock guard(_mutex);
+            Lock guard(_mutex);
             _pvGetBitSet->serialize(buffer, control);
             _pvGetStructure->serialize(buffer, control, _pvGetBitSet.get());
         }
@@ -2334,13 +2334,13 @@ void ServerChannelArrayRequesterImpl::destroy()
 
 ChannelArray::shared_pointer ServerChannelArrayRequesterImpl::getChannelArray()
 {
-    //Lock guard(_mutex);
+    Lock guard(_mutex);
     return _channelArray;
 }
 
 PVArray::shared_pointer ServerChannelArrayRequesterImpl::getPVArray()
 {
-    //Lock guard(_mutex);
+    Lock guard(_mutex);
     return _pvArray;
 }
 
@@ -2369,13 +2369,13 @@ void ServerChannelArrayRequesterImpl::send(ByteBuffer* buffer, TransportSendCont
     {
         if ((QOS_GET & request) != 0)
         {
-            //Lock guard(_mutex);
+            Lock guard(_mutex);
             ScopedLock lock(channelArray);
             _pvArray->serialize(buffer, control, 0, _pvArray->getLength());
         }
         else if ((QOS_PROCESS & request) != 0)
         {
-            //Lock guard(_mutex);
+            Lock guard(_mutex);
             SerializeHelper::writeSize(_length, buffer, control);
         }
         else if ((QOS_INIT & request) != 0)
@@ -2610,7 +2610,7 @@ void ServerChannelProcessRequesterImpl::destroy()
 
 ChannelProcess::shared_pointer ServerChannelProcessRequesterImpl::getChannelProcess()
 {
-    //Lock guard(_mutex);
+    Lock guard(_mutex);
     return _channelProcess;
 }
 
@@ -2863,7 +2863,7 @@ void ServerChannelRPCRequesterImpl::destroy()
 
 ChannelRPC::shared_pointer ServerChannelRPCRequesterImpl::getChannelRPC()
 {
-    //Lock guard(_mutex);
+    Lock guard(_mutex);
     return _channelRPC;
 }
 
