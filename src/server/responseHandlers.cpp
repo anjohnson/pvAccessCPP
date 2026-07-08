@@ -1170,19 +1170,17 @@ void ServerChannelGetRequesterImpl::destroy()
     // destroyed prematurely
     shared_pointer self(shared_from_this());
 
-    // hold a reference to channelGet so that _channelGet.reset()
-    // does not call ~ChannelGet (external code) while we are holding a lock
-    ChannelGet::shared_pointer channelGet = _channelGet;
+    // Take ownership of the ChannelGet under our lock, but
+    // its destroy() and destructor must run outside the lock.
+    ChannelGet::shared_pointer channelGet;
     {
         Lock guard(_mutex);
         _channel->unregisterRequest(_ioid);
-
-        if (_channelGet)
-        {
-            _channelGet->destroy();
-            _channelGet.reset();
-        }
+        channelGet.swap(_channelGet);
     }
+
+    if (channelGet)
+        channelGet->destroy();
 }
 
 ChannelGet::shared_pointer ServerChannelGetRequesterImpl::getChannelGet()
@@ -1406,19 +1404,17 @@ void ServerChannelPutRequesterImpl::destroy()
     // destroyed prematurely
     shared_pointer self(shared_from_this());
 
-    // hold a reference to channelGet so that _channelPut.reset()
-    // does not call ~ChannelPut (external code) while we are holding a lock
-    ChannelPut::shared_pointer channelPut = _channelPut;
+    // Take ownership of the ChannelPut under our lock, but
+    // its destroy() and destructor must run outside the lock.
+    ChannelPut::shared_pointer channelPut;
     {
         Lock guard(_mutex);
         _channel->unregisterRequest(_ioid);
-
-        if (_channelPut)
-        {
-            _channelPut->destroy();
-            _channelPut.reset();
-        }
+        channelPut.swap(_channelPut);
     }
+
+    if (channelPut)
+        channelPut->destroy();
 }
 
 ChannelPut::shared_pointer ServerChannelPutRequesterImpl::getChannelPut()
@@ -1675,19 +1671,17 @@ void ServerChannelPutGetRequesterImpl::destroy()
     // destroyed prematurely
     shared_pointer self(shared_from_this());
 
-    // hold a reference to channelPutGet so that _channelPutGet.reset()
-    // does not call ~ChannelPutGet (external code) while we are holding a lock
-    ChannelPutGet::shared_pointer channelPutGet = _channelPutGet;
+    // Take ownership of the ChannelPutGet under our lock, but
+    // its destroy() and destructor must run outside the lock.
+    ChannelPutGet::shared_pointer channelPutGet;
     {
         Lock guard(_mutex);
         _channel->unregisterRequest(_ioid);
-
-        if (_channelPutGet)
-        {
-            _channelPutGet->destroy();
-            _channelPutGet.reset();
-        }
+        channelPutGet.swap(_channelPutGet);
     }
+
+    if (channelPutGet)
+        channelPutGet->destroy();
 }
 
 ChannelPutGet::shared_pointer ServerChannelPutGetRequesterImpl::getChannelPutGet()
@@ -2317,19 +2311,17 @@ void ServerChannelArrayRequesterImpl::destroy()
     // destroyed prematurely
     shared_pointer self(shared_from_this());
 
-    // hold a reference to channelArray so that _channelArray.reset()
-    // does not call ~ChannelArray (external code) while we are holding a lock
-    ChannelArray::shared_pointer channelArray = _channelArray;
+    // Take ownership of the ChannelArray under our lock, but
+    // its destroy() and destructor must run outside the lock.
+    ChannelArray::shared_pointer channelArray;
     {
         Lock guard(_mutex);
         _channel->unregisterRequest(_ioid);
-
-        if (_channelArray)
-        {
-            _channelArray->destroy();
-            _channelArray.reset();
-        }
+        channelArray.swap(_channelArray);
     }
+
+    if (channelArray)
+        channelArray->destroy();
 }
 
 ChannelArray::shared_pointer ServerChannelArrayRequesterImpl::getChannelArray()
@@ -2848,17 +2840,17 @@ void ServerChannelRPCRequesterImpl::destroy()
     // destroyed prematurely
     shared_pointer self(shared_from_this());
 
+    // Take ownership of the ChannelRPC under our lock, but
+    // its destroy() and destructor must run outside the lock.
+    ChannelRPC::shared_pointer channelRPC;
     {
         Lock guard(_mutex);
         _channel->unregisterRequest(_ioid);
-
-        if (_channelRPC.get())
-        {
-            _channelRPC->destroy();
-        }
+        channelRPC.swap(_channelRPC);
     }
-    // TODO
-    _channelRPC.reset();
+
+    if (channelRPC)
+        channelRPC->destroy();
 }
 
 ChannelRPC::shared_pointer ServerChannelRPCRequesterImpl::getChannelRPC()
