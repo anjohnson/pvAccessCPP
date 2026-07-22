@@ -348,10 +348,18 @@ void ServerSearchHandler::handleResponse(osiSockAddr* responseFrom,
         {
             transport->ensureData(4);
             const int32 cid = payloadBuffer->getInt();
-            const string name = SerializeHelper::deserializeString(payloadBuffer, transport.get());
 
-            // Ignore over-length names
-            if (allowed && name.size() <= MAX_CHANNEL_NAME_LENGTH)
+#ifdef DESERIALIZE_STRING_HAS_LIMIT
+#  define COMMA_MAX_CHANNEL_NAME_LEN , MAX_CHANNEL_NAME_LENGTH
+#  define NAME_SIZE_OK 1
+#else
+#  define COMMA_MAX_CHANNEL_NAME_LEN
+#  define NAME_SIZE_OK (name.size() <= MAX_CHANNEL_NAME_LENGTH)
+#endif
+            const string name = SerializeHelper::deserializeString(payloadBuffer,
+                    transport.get() COMMA_MAX_CHANNEL_NAME_LEN);
+
+            if (allowed && NAME_SIZE_OK)
             {
                 const std::vector<ChannelProvider::shared_pointer>& _providers = _context->getChannelProviders();
 
@@ -740,7 +748,8 @@ void ServerCreateChannelHandler::handleResponse(osiSockAddr* responseFrom,
     }
     const pvAccessID cid = payloadBuffer->getInt();
 
-    string channelName = SerializeHelper::deserializeString(payloadBuffer, transport.get());
+    string channelName = SerializeHelper::deserializeString(payloadBuffer,
+            transport.get() COMMA_MAX_CHANNEL_NAME_LEN);
     if (channelName.size() == 0)
     {
         LOG(logLevelDebug,"Zero length channel name, disconnecting client: %s", transport->getRemoteName().c_str());
