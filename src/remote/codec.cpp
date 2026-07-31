@@ -1678,7 +1678,10 @@ void BlockingServerTCPTransportCodec::authNZInitialize(const std::string& securi
     info->authority = securityPluginName;
 
     if (!plugin->isValidFor(*info))
+    {
         verified(pvData::Status::error("invalid security plug-in name"));
+        return;
+    }
 
     if (IS_LOGGABLE(logLevelDebug))
     {
